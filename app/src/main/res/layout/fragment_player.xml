@@ -11,10 +11,20 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/playerTextView"
+            android:id="@+id/playerSongTitleTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="player"
+            android:layout_marginBottom="24dp"
+            app:layout_constraintBottom_toTopOf="@id/playerPlayPauseButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageButton
+            android:id="@+id/playerPlayPauseButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_play"
+            android:padding="48dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
