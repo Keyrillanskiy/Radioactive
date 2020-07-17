@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
 
         navigator = SupportAppNavigator(this, R.id.mainFragmentContainer)
 
-        router.navigateTo(Screens.PlayerScreen())
+        router.replaceScreen(Screens.PlayerScreen())
     }
 
     override fun onResume() {
