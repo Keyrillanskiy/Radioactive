@@ -4,15 +4,19 @@ import android.content.ComponentName
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.github.keyrillanskiy.radioactive.R
 import com.github.keyrillanskiy.radioactive.data.player.PlayerMediaBrowserService
 import com.github.keyrillanskiy.radioactive.databinding.FragmentPlayerBinding
 import com.google.android.exoplayer2.ExoPlayer
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.android.synthetic.main.fragment_player.*
 import ru.terrakok.cicerone.Router
 import javax.inject.Inject
 
@@ -33,7 +37,21 @@ class PlayerFragment : Fragment() {
         override fun onConnected() {
             val mediaController = MediaControllerCompat(requireContext(), mediaBrowser.sessionToken)
             MediaControllerCompat.setMediaController(requireActivity(), mediaController)
-            buildTransportControls()
+            buildTransportControls(mediaController)
+        }
+    }
+
+    private val controllerCallback = object : MediaControllerCompat.Callback() {
+        override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
+            playerSongTitleTextView.text = metadata?.description?.title ?: ""
+        }
+
+        override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
+            if(state?.state == PlaybackStateCompat.STATE_PLAYING) {
+                playerPlayPauseButton.setBackgroundResource(R.drawable.ic_pause)
+            } else {
+                playerPlayPauseButton.setBackgroundResource(R.drawable.ic_play)
+            }
         }
     }
 
@@ -90,5 +108,24 @@ class PlayerFragment : Fragment() {
         mediaBrowser.disconnect()
         super.onStop()
     }
-    
+
+    fun buildTransportControls(mediaController: MediaControllerCompat) {
+        playerPlayPauseButton.apply {
+            setOnClickListener {
+                val playbackState = mediaController.playbackState.state
+                if (playbackState == PlaybackStateCompat.STATE_PLAYING) {
+                    mediaController.transportControls.pause()
+                } else {
+                    mediaController.transportControls.play()
+                }
+            }
+        }
+
+        //TODO: Display the initial state
+        val metadata = mediaController.metadata
+        val pbState = mediaController.playbackState
+
+        mediaController.registerCallback(controllerCallback)
+    }
+
 }
