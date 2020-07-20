@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment
 import com.github.keyrillanskiy.radioactive.R
 import com.github.keyrillanskiy.radioactive.data.player.PlayerMediaBrowserService
 import com.github.keyrillanskiy.radioactive.databinding.FragmentPlayerBinding
-import com.google.android.exoplayer2.ExoPlayer
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_player.*
 import ru.terrakok.cicerone.Router
@@ -27,9 +26,6 @@ class PlayerFragment : Fragment() {
 
     @Inject
     lateinit var router: Router
-
-    @Inject
-    lateinit var exoPlayer: ExoPlayer
 
     private lateinit var mediaBrowser: MediaBrowserCompat
 
@@ -78,24 +74,6 @@ class PlayerFragment : Fragment() {
             connectionCallbacks,
             null
         )
-
-        //test code:
-//        val appName = getString(R.string.app_name)
-//        val dataSourceFactory = DefaultDataSourceFactory(context, Util.getUserAgent(context, appName))
-//        val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory, DefaultExtractorsFactory())
-//            .createMediaSource(Uri.parse("http://sintezfm.radioactivelab.pro:8000/sfm192.aac"))
-//
-//        exoPlayer.prepare(mediaSource)
-//
-//        playerPlayPauseButton.setOnClickListener {
-//            if (exoPlayer.playWhenReady) {
-//                playerPlayPauseButton.setBackgroundResource(R.drawable.ic_play)
-//                exoPlayer.playWhenReady = false
-//            } else {
-//                playerPlayPauseButton.setBackgroundResource(R.drawable.ic_pause)
-//                exoPlayer.playWhenReady = true
-//            }
-//        }
     }
 
     override fun onStart() {
