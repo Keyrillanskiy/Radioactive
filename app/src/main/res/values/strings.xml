@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Radioactive</string>
+    
+    <string name="unknown">Unknown</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    
+    <string name="notification_channel_name">Radioactive</string>
+    <string name="notification_channel_description">All notifications</string>
+    
 </resources>

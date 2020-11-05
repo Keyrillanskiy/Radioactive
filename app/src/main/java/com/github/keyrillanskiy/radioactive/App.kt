@@ -1,6 +1,11 @@
 package com.github.keyrillanskiy.radioactive
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
+import com.github.keyrillanskiy.radioactive.data.player.PlayerMediaBrowserService
 import com.github.keyrillanskiy.radioactive.di.DaggerAppComponent
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
@@ -19,14 +24,30 @@ class App : Application(), HasAndroidInjector {
 
     override fun onCreate() {
         super.onCreate()
-        DaggerAppComponent.create().inject(this)
+        DaggerAppComponent.factory().create(this).inject(this)
 
         setupLogging()
+        createNotificationChannel()
     }
 
     private fun setupLogging() {
         Timber.plant(Timber.DebugTree())
         //TODO: plant release tree
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.notification_channel_name)
+            val descriptionText = getString(R.string.notification_channel_description)
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel =
+                NotificationChannel(PlayerMediaBrowserService.NOTIFICATION_CHANNEL_ID, name, importance).apply {
+                    description = descriptionText
+                }
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
     }
 
 }

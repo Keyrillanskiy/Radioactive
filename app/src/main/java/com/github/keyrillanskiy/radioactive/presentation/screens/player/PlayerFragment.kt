@@ -15,7 +15,6 @@ import com.github.keyrillanskiy.radioactive.R
 import com.github.keyrillanskiy.radioactive.data.player.PlayerMediaBrowserService
 import com.github.keyrillanskiy.radioactive.databinding.FragmentPlayerBinding
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.fragment_player.*
 import ru.terrakok.cicerone.Router
 import javax.inject.Inject
 
@@ -27,6 +26,7 @@ class PlayerFragment : Fragment() {
     @Inject
     lateinit var router: Router
 
+    private var playerBinding: FragmentPlayerBinding? = null
     private lateinit var mediaBrowser: MediaBrowserCompat
 
     private val connectionCallbacks = object : MediaBrowserCompat.ConnectionCallback() {
@@ -39,14 +39,13 @@ class PlayerFragment : Fragment() {
 
     private val controllerCallback = object : MediaControllerCompat.Callback() {
         override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
-            playerSongTitleTextView.text = metadata?.description?.title ?: ""
+            playerBinding?.playerSongTitleTextView?.text = metadata?.description?.title ?: getString(R.string.unknown)
         }
 
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-            if(state?.state == PlaybackStateCompat.STATE_PLAYING) {
-                playerPlayPauseButton.setBackgroundResource(R.drawable.ic_pause)
-            } else {
-                playerPlayPauseButton.setBackgroundResource(R.drawable.ic_play)
+            when (state?.state) {
+                PlaybackStateCompat.STATE_PLAYING -> playerBinding?.playerPlayPauseButton?.setBackgroundResource(R.drawable.ic_pause)
+                else -> playerBinding?.playerPlayPauseButton?.setBackgroundResource(R.drawable.ic_play)
             }
         }
     }
@@ -61,7 +60,8 @@ class PlayerFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return FragmentPlayerBinding.inflate(inflater, container, false).root
+        playerBinding = FragmentPlayerBinding.inflate(inflater, container, false)
+        return playerBinding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -88,20 +88,14 @@ class PlayerFragment : Fragment() {
     }
 
     fun buildTransportControls(mediaController: MediaControllerCompat) {
-        playerPlayPauseButton.apply {
-            setOnClickListener {
-                val playbackState = mediaController.playbackState.state
-                if (playbackState == PlaybackStateCompat.STATE_PLAYING) {
-                    mediaController.transportControls.pause()
-                } else {
-                    mediaController.transportControls.play()
+        playerBinding?.let { binding ->
+            binding.playerPlayPauseButton.setOnClickListener {
+                when (mediaController.playbackState.state) {
+                    PlaybackStateCompat.STATE_PLAYING -> mediaController.transportControls.pause()
+                    PlaybackStateCompat.STATE_PAUSED -> mediaController.transportControls.play()
                 }
             }
         }
-
-        //TODO: Display the initial state
-        val metadata = mediaController.metadata
-        val pbState = mediaController.playbackState
 
         mediaController.registerCallback(controllerCallback)
     }
